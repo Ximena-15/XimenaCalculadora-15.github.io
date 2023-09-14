@@ -1,91 +1,41 @@
-let diccionario = ['APPLE', 'HURLS', 'WINGS', 'YOUTH', 'PEAKS']
-let indice =  Math.floor(Math.random() * diccionario.length);
-console.log (indice);
-let palabra;
+const CALCULAR = document.getElementById('calcular');
+const ERROR = document.getElementById('error');
+const FLU = document.getElementById('flu');
+const MAN = document.getElementById('man');
 
-fetch('https://random-word-api.herokuapp.com/word?length=5&lang=en')
- 	.then(response => response.json())
- 	.then(response => {
-         console.log(response)
-         palabra = response[0].toUpperCase()
-     })
- 	.catch(err => console.error(err));
-console.log (palabra);
+function calcFlujo(peso){
+    let resto = peso;
+    let flujo = 0;
+    if (resto>=20){
+        let aux = resto-20;
+        flujo += aux; // flujo = flujo + aux;
+        resto -= aux;
+    }
 
-const button = document.getElementById ("guess-button");
-button.addEventListener("click", intentar);
-const input = document.getElementById("guess-input");
-let intentos = 6;
-button.addEventListener("click", intentar);
-let reiniciarBtn = document.getElementById("reiniciar-btn");
-function intentar() {
-    const INTENTO = leerIntento();
-    const GRID = document.getElementById("grid");
-    const ROW = document.createElement("div");
-    ROW.className = "row";
-    if (INTENTO.length != 5) {
-        alert("Debe ingresar una palabra de 5 letras");
-        return;
+    if (resto>10){
+        let aux = resto-10;
+        flujo += aux*2;
+        resto -= aux;
     }
-    if (INTENTO === palabra) {
-        terminar("<h1>GANASTE:=</h1>");
-        button.disabled = true;
-        reiniciarBtn.disabled = true;
-        return;
-    }
-    for (let i in palabra) {
-        const SPAN = document.createElement("span");
-        SPAN.className = "letter";
-        if (INTENTO[i] === palabra[i]) {
-            SPAN.innerHTML = INTENTO[i];
-            SPAN.style.backgroundColor = "green";
-            console.log(INTENTO[i], "VERDE");
-        } else if (palabra.includes(INTENTO[i])) {
-            SPAN.innerHTML = INTENTO[i];
-            SPAN.style.backgroundColor = "yellow";
-            console.log(INTENTO[i], "AMARILLO");
-        } else {
-            SPAN.innerHTML = INTENTO[i];
-            SPAN.style.backgroundColor = "gray";
-            console.log(INTENTO[i], "GRIS");
-        }
-        ROW.appendChild(SPAN);
-    }
-    GRID.appendChild(ROW);
-    intentos--;
-    if (intentos === 0) {
-        terminar("<h1>PERDISTE:(</h1>");
-        button.disabled = true;
-        reiniciarBtn.disabled = true;
-    }
+    flujo += resto*4;
+    return flujo;
 }
 
-    function leerIntento(){
-        let intento = document.getElementById("guess-input");
-        intento = intento.value;
-        intento = intento.toUpperCase(); 
-        return intento;
+
+CALCULAR.addEventListener('click', () => {
+    const DATO = document.getElementById('peso').value
+
+    if (DATO > 0){
+        ERROR.style.display = 'none'
+        let flujo = calcFlujo(DATO);
+        let mantenimiento = flujo*1.5;
+        FLU.innerHTML = flujo + ' cc/hr';
+        MAN.innerHTML = 'm+m/2 ' + mantenimiento + ' cc/hr';
+        FLU.style.display = 'block';
+        MAN.style.display = 'block';
+    } else {
+        ERROR.style.display = 'block';
+        FLU.style.display = 'none';
+        MAN.style.display = 'none';
     }
-    function terminar(mensaje){
-        const input = document.getElementById("guess-input");
-        input.disabled = true;
-        buttondisabled = true;
-        let contenedor = document.getElementById('mensaje');
-        contenedor.innerHTML = mensaje;
-    }
-
-reiniciarBtn.addEventListener("click", reiniciarJuego);
-
-function reiniciarJuego() {
-    intentos = 6;
-    palabra = '';
-
-    const grid = document.getElementById("grid");
-    grid.innerHTML = '';
- 
-    input.disabled = true;
-    let contenedor = document.getElementById('mensaje');
-    contenedor.innerHTML = '';
-    button.disabled = true;
-    reiniciarBtn.disabled = true;
-}
+}) 
